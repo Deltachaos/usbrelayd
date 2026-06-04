@@ -13,20 +13,16 @@ RUN git clone https://github.com/darrylb123/usbrelay.git app
 
 WORKDIR /app
 
-# Copy the source code
-COPY . /app
-
 # Compile the application
 RUN make -C /app  
 RUN make -C /app/usbrelay_py
-
 
 # Stage 2: Runtime stage
 FROM python:slim
 
 COPY --from=build /app/usbrelay /usr/local/bin/usbrelay
 COPY --from=build /app/usbrelayd /usr/local/sbin
-
+COPY entrypoint.sh /entrypoint.sh
 COPY --from=build /app/libusbrelay.so.1.? /usr/lib
 COPY --from=build /app/usbrelay_py/dist/usbrelay_py*.whl /tmp/
 
@@ -37,4 +33,4 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* && \
     ln -sf /tmp/usbrelayd.conf /etc/usbrelayd.conf
 
-ENTRYPOINT ["python3","/usr/local/sbin/usbrelayd"]
+ENTRYPOINT ["/entrypoint.sh"]
