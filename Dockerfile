@@ -26,7 +26,8 @@ COPY entrypoint.sh /entrypoint.sh
 COPY --from=build /app/libusbrelay.so.1.? /usr/lib
 COPY --from=build /app/usbrelay_py/dist/usbrelay_py*.whl /tmp/
 
-RUN apt-get update && \
+RUN chmod +x /entrypoint.sh && \
+    apt-get update && \
     apt-get install -y --no-install-recommends libhidapi-hidraw0 && \
     python3 -m pip install paho-mqtt && \
     python3 -m pip install /tmp/usbrelay_py*.whl && \
